@@ -3,6 +3,7 @@ from flask import *
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+from retrieval_model.model import getTheAnswer
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'XYZ')
@@ -19,4 +20,10 @@ db = firestore.client()
 def mainRoute():
     req = request.get_json(silent=True)
     intent = req["queryResult"]["intent"]["displayName"]
-    return make_response(jsonify(fulfillmentText="Hello pal!"))
+    query = req["queryResult"]["queryText"]
+    if intent == "qa_system":
+        # qa system function
+        return make_response(getTheAnswer(query))
+    else:
+        # generative chatter bot
+        return make_response(jsonify(fulfillmentText="I am Mr Moon !"))
